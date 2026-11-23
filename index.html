@@ -2,159 +2,494 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>جسر</title>
+<meta name="theme-color" content="#4f46e5">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#6b7280;--br:#e5e7eb;--ac:#2563eb}
-@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#181b21;--tx:#e8eaed;--mu:#9aa0a6;--br:#2a2f38;--ac:#60a5fa}}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--tx)}
-.app{display:flex;min-height:100vh}
-aside{width:240px;background:var(--card);border-left:1px solid var(--br);padding:16px;position:sticky;top:0;height:100vh;overflow:auto}
-h1{margin:0 0 14px;font-size:22px}
-.sec{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:4px}
-.sec:hover{background:var(--bg)}.sec.on{background:var(--ac);color:#fff}
-.sec button{opacity:.6}
-main{flex:1;padding:20px;max-width:860px;margin:0 auto;width:100%}
-button{font:inherit;border:1px solid var(--br);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:10px;cursor:pointer}
-button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
-.sec button{background:none;border:0;color:inherit;padding:0 4px}
-textarea{width:100%;min-height:90px;padding:12px;border-radius:12px;border:1px solid var(--br);background:var(--card);color:var(--tx);font:inherit;resize:vertical}
-.row{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
-.drop{border:2px dashed var(--br);border-radius:12px;padding:16px;text-align:center;color:var(--mu);margin:10px 0}
-.drop.o{border-color:var(--ac);color:var(--ac)}
-.it{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:12px;margin-bottom:10px}
-.it .t{white-space:pre-wrap;word-break:break-word}
-.it img{max-width:100%;max-height:320px;border-radius:8px;display:block;margin-bottom:8px}
-.meta{color:var(--mu);font-size:12px;margin-top:6px}
-.acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.acts button{padding:5px 10px;font-size:13px}
-a{color:var(--ac)}
-#menu{display:none}
-@media(max-width:700px){
- aside{position:fixed;right:0;z-index:5;transform:translateX(100%);transition:.2s;box-shadow:0 0 30px #0005}
- aside.open{transform:none}
- #menu{display:inline-block}
+:root{
+  --bg:#f5f6fa;--card:#fff;--card2:#f0f2f8;--tx:#161a23;--mu:#6b7385;--br:#e4e7ef;
+  --ac:#4f46e5;--ac2:#7c3aed;--acs:#eef0ff;--dn:#e5484d;--sh:0 1px 2px #1a1f3a0d,0 8px 24px -12px #1a1f3a22;
+  --ease:cubic-bezier(.22,1,.36,1);
 }
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:8px 16px;border-radius:20px;display:none}
+:root[data-theme=dark]{
+  --bg:#0c0e14;--card:#151822;--card2:#1c2030;--tx:#e9ebf2;--mu:#8c93a6;--br:#262b3b;
+  --ac:#818cf8;--ac2:#a78bfa;--acs:#1e2240;--dn:#ff6b70;--sh:0 1px 2px #0006,0 8px 24px -12px #000a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);
+  transition:background .35s var(--ease),color .35s var(--ease);-webkit-font-smoothing:antialiased}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.app{display:flex;min-height:100vh}
+
+/* sidebar */
+aside{width:272px;flex:none;background:var(--card);border-left:1px solid var(--br);padding:20px 14px;position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;transition:background .35s var(--ease),transform .4s var(--ease)}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px;font-weight:700;font-size:21px}
+.logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#fff;box-shadow:0 6px 16px -6px var(--ac)}
+.logo svg{width:20px;height:20px;stroke-width:2.2}
+.lbl{font-size:12px;color:var(--mu);padding:6px 10px;font-weight:500}
+#secs{flex:1;overflow:auto;margin:0 -6px;padding:0 6px}
+.sec{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;cursor:pointer;margin-bottom:3px;position:relative;
+  transition:background .2s,transform .2s var(--ease);animation:slideIn .45s var(--ease) both}
+.sec:hover{background:var(--card2)}
+.sec:active{transform:scale(.98)}
+.sec.on{background:var(--acs);font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 18%,transparent)}
+.sec .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cnt{font-size:12px;color:var(--mu);background:var(--card2);padding:1px 8px;border-radius:20px;min-width:24px;text-align:center}
+.sec.on .cnt{background:var(--card)}
+.sec .tools{display:none;gap:2px}
+.sec:hover .tools{display:flex}
+.sec:hover .cnt{display:none}
+.mini{padding:4px;border-radius:8px;color:var(--mu)}
+.mini:hover{background:var(--card);color:var(--tx)}
+.mini svg{width:15px;height:15px}
+.side-foot{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--br)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:12px;background:var(--card2);font-weight:500;
+  transition:transform .2s var(--ease),background .2s,box-shadow .25s,opacity .2s;position:relative;overflow:hidden}
+.btn:hover{background:var(--br)}
+.btn:active{transform:scale(.95)}
+.btn.p{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 8px 20px -8px var(--ac)}
+.btn.p:hover{box-shadow:0 10px 24px -6px var(--ac);filter:brightness(1.06)}
+.btn.ic{padding:10px}
+.btn.full{width:100%}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:10px;gap:6px}
+.btn.sm svg{width:15px;height:15px}
+.btn.danger:hover{background:color-mix(in srgb,var(--dn) 16%,transparent);color:var(--dn)}
+.rip{position:absolute;border-radius:50%;background:#fff6;transform:scale(0);animation:rip .6s var(--ease) forwards;pointer-events:none}
+
+/* main */
+main{flex:1;min-width:0;padding:22px clamp(14px,3vw,36px) 120px;max-width:900px;margin:0 auto;width:100%}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+#title{margin:0;font-size:24px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:fade .4s var(--ease)}
+#menu{display:none}
+.search{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--br);border-radius:12px;padding:0 12px;width:210px;transition:width .35s var(--ease),border-color .2s,box-shadow .2s}
+.search:focus-within{width:280px;border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)}
+.search input{border:0;background:none;outline:0;font:inherit;color:var(--tx);padding:10px 0;width:100%}
+.search svg{color:var(--mu)}
+
+.composer{background:var(--card);border:1px solid var(--br);border-radius:18px;padding:12px;box-shadow:var(--sh);transition:border-color .2s,box-shadow .3s}
+.composer:focus-within{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 14%,transparent),var(--sh)}
+textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;color:var(--tx);min-height:56px;max-height:240px;padding:6px 8px;line-height:1.7}
+.crow{display:flex;gap:8px;align-items:center;justify-content:space-between;padding-top:6px}
+.hint{font-size:12px;color:var(--mu)}
+
+/* items */
+#list{margin-top:20px;display:grid;gap:10px}
+.it{background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;box-shadow:var(--sh);position:relative;
+  transition:transform .3s var(--ease),border-color .2s,box-shadow .3s,opacity .3s,max-height .3s;}
+.it:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--ac) 40%,var(--br))}
+.it.in{animation:rise .55s var(--ease) both}
+.it.out{opacity:0;transform:scale(.94) translateX(30px)}
+.it.sel{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 20%,transparent)}
+.it.pin::before{content:"";position:absolute;inset:0 auto 0 0;width:0}
+.pinb{position:absolute;top:12px;left:12px;color:var(--ac);display:none}
+.it.pin .pinb{display:block}
+.chk{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;border:2px solid var(--br);display:grid;place-items:center;
+  color:#fff;opacity:0;transform:scale(.7);transition:all .25s var(--ease);background:var(--card)}
+.it:hover .chk,.selmode .chk{opacity:1;transform:none}
+.it.sel .chk{background:var(--ac);border-color:var(--ac);opacity:1;transform:none}
+.chk svg{width:13px;height:13px;stroke-width:3}
+.body{padding-inline-start:0}
+.selmode .it .body,.it:hover .body{}
+.t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding-inline-end:30px}
+.t a{color:var(--ac);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--ac) 40%,transparent)}
+.lk{display:flex;align-items:center;gap:10px;background:var(--card2);padding:9px 12px;border-radius:12px;margin-top:10px;text-decoration:none;color:var(--tx);transition:background .2s}
+.lk:hover{background:var(--acs)}
+.lk img{width:20px;height:20px;border-radius:5px}
+.lk span{color:var(--mu);font-size:13px;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.thumb{width:100%;max-height:340px;object-fit:cover;border-radius:12px;display:block;margin-bottom:12px;cursor:zoom-in;background:var(--card2);
+  transition:transform .4s var(--ease),filter .3s;min-height:80px}
+.thumb:hover{filter:brightness(1.05)}
+.file{display:flex;align-items:center;gap:12px;padding-inline-end:30px}
+.badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none;letter-spacing:.3px}
+.fn{font-weight:500;word-break:break-all;line-height:1.5}
+.meta{color:var(--mu);font-size:12.5px;margin-top:3px}
+.acts{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.empty{text-align:center;color:var(--mu);padding:56px 20px;animation:fade .6s var(--ease)}
+.empty .em{width:72px;height:72px;margin:0 auto 14px;border-radius:22px;background:var(--acs);color:var(--ac);display:grid;place-items:center;animation:float 3.2s ease-in-out infinite}
+.empty .em svg{width:32px;height:32px}
+.sk{height:76px;border-radius:16px;background:linear-gradient(100deg,var(--card) 30%,var(--card2) 50%,var(--card) 70%);background-size:300% 100%;animation:shine 1.4s linear infinite;border:1px solid var(--br)}
+
+/* bulk bar */
+#bulk{position:fixed;left:50%;bottom:22px;transform:translate(-50%,140%);background:var(--tx);color:var(--bg);padding:8px 8px 8px 14px;border-radius:18px;
+  display:flex;align-items:center;gap:6px;box-shadow:0 20px 40px -10px #0007;transition:transform .5s var(--ease);z-index:20;max-width:calc(100vw - 24px)}
+#bulk.on{transform:translate(-50%,0)}
+#bulk .btn{background:#ffffff1f;color:inherit;padding:8px 12px}
+#bulk .btn.danger:hover{background:var(--dn);color:#fff}
+#bulk b{margin-inline-end:6px;white-space:nowrap}
+
+/* upload progress */
+#ups{position:fixed;bottom:22px;inset-inline-start:22px;display:grid;gap:8px;z-index:30;width:min(320px,calc(100vw - 44px))}
+.up{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:11px 13px;box-shadow:var(--sh);animation:pop .5s var(--ease) both;font-size:13px}
+.up .r{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px}
+.up .r span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{height:5px;background:var(--card2);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:5px;transition:width .2s}
+.up.done{opacity:0;transform:translateY(10px);transition:all .5s .8s}
+
+/* toast */
+#toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-90px);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:30px;
+  font-size:14px;transition:transform .5s var(--ease);z-index:60;box-shadow:0 12px 30px -10px #0006}
+#toast.on{transform:translate(-50%,0)}
+
+/* drop overlay */
+#dz{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(8px);display:grid;place-items:center;z-index:50;
+  opacity:0;pointer-events:none;transition:opacity .25s}
+#dz.on{opacity:1}
+#dz div{border:2.5px dashed var(--ac);border-radius:28px;padding:56px 70px;text-align:center;color:var(--ac);font-size:20px;font-weight:600;
+  transform:scale(.92);transition:transform .4s var(--ease);background:var(--card)}
+#dz.on div{transform:none}
+
+/* lightbox */
+#lb{position:fixed;inset:0;background:#000d;backdrop-filter:blur(6px);z-index:70;display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .3s}
+#lb.on{opacity:1;pointer-events:auto}
+#lb img{max-width:92vw;max-height:86vh;border-radius:14px;transform:scale(.88);transition:transform .45s var(--ease),opacity .25s;box-shadow:0 30px 80px #000a}
+#lb.on img{transform:none}
+#lb .nav{position:absolute;top:50%;transform:translateY(-50%);background:#ffffff22;color:#fff;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;transition:background .2s,transform .2s}
+#lb .nav:hover{background:#ffffff44}#lb .nav:active{transform:translateY(-50%) scale(.9)}
+#lb .nav.l{left:16px}#lb .nav.r{right:16px}
+#lb .x{position:absolute;top:16px;right:16px;background:#ffffff22;color:#fff;width:42px;height:42px;border-radius:50%;display:grid;place-items:center}
+#lb .cap{position:absolute;bottom:20px;color:#fff;font-size:13px;opacity:.8}
+
+#back{position:fixed;inset:0;background:#0007;z-index:35;opacity:0;pointer-events:none;transition:opacity .3s;display:none}
+
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes float{50%{transform:translateY(-7px)}}
+@keyframes shine{to{background-position:-150% 0}}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+@media(max-width:760px){
+  #menu{display:inline-flex}
+  aside{position:fixed;inset:0 0 0 auto;z-index:40;height:100dvh;width:290px;transform:translateX(105%);box-shadow:-20px 0 60px #0005}
+  aside.open{transform:none}
+  #back{display:block}#back.on{opacity:1;pointer-events:auto}
+  .search{width:44px;padding:0 11px}.search input{width:0;padding:0}
+  .search:focus-within{width:calc(100vw - 150px);position:absolute;inset-inline:12px;z-index:5;width:auto}
+  .search:focus-within input{width:100%;padding:10px 0}
+  .sec .tools{display:flex}.sec .cnt{display:none}
+  .chk{opacity:1;transform:none}
+  #ups{inset-inline-start:12px}
+  #lb .nav{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
+<div id="back"></div>
 <div class="app">
  <aside id="side">
-  <h1>🌉 جسر</h1>
+  <div class="brand"><div class="logo"><svg viewBox="0 0 24 24"><path d="M2 18c3-9 17-9 20 0M2 18h20M7 18v-5M12 18V9M17 18v-5"/></svg></div>جسر</div>
+  <div class="lbl">الأقسام</div>
   <div id="secs"></div>
-  <button class="p" style="width:100%;margin-top:10px" onclick="addSec()">+ قسم جديد</button>
+  <button class="btn p full" id="addSec"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>قسم جديد</button>
+  <div class="side-foot">
+   <button class="btn full" id="theme"><svg id="themeIc" viewBox="0 0 24 24"></svg><span id="themeTx">المظهر</span></button>
+  </div>
  </aside>
  <main>
-  <div class="row" style="justify-content:space-between;align-items:center">
-   <button id="menu" onclick="side.classList.toggle('open')">☰ الأقسام</button>
-   <h2 id="title" style="margin:0"></h2>
+  <div class="top">
+   <button class="btn ic" id="menu" aria-label="الأقسام"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+   <h2 id="title"></h2>
+   <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" placeholder="بحث..." autocomplete="off"></label>
   </div>
-  <textarea id="txt" placeholder="الصق نص أو رابط هنا... (تقدر تلصق صورة أيضاً)"></textarea>
-  <div class="row">
-   <button class="p" onclick="sendText()">إرسال النص</button>
-   <button onclick="fi.click()">📎 رفع ملفات</button>
-   <input type="file" id="fi" multiple hidden>
+  <div class="composer">
+   <textarea id="txt" placeholder="الصق نص أو رابط، أو صورة من الحافظة..." rows="2"></textarea>
+   <div class="crow">
+    <div style="display:flex;gap:8px"><button class="btn sm" id="pick"><svg viewBox="0 0 24 24"><path d="M21 12l-9 9a6 6 0 01-8.5-8.5l9-9a4 4 0 015.7 5.7l-9 9a2 2 0 01-2.8-2.8l8.3-8.3"/></svg>رفع ملفات</button></div>
+    <span class="hint">Ctrl+Enter للإرسال</span>
+    <button class="btn p sm" id="send"><svg viewBox="0 0 24 24"><path d="M5 12l14-7-5 15-3-6-6-2z"/></svg>إرسال</button>
+   </div>
   </div>
-  <div class="drop" id="drop">أو اسحب الملفات وأفلتها هنا</div>
+  <input type="file" id="fi" multiple hidden>
   <div id="list"></div>
  </main>
 </div>
+
+<div id="bulk"><b id="bn"></b>
+ <button class="btn sm" data-b="dl"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>تنزيل</button>
+ <button class="btn sm" data-b="cp"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></svg>نسخ</button>
+ <button class="btn sm danger" data-b="del"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>حذف</button>
+ <button class="btn sm" data-b="x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+<div id="ups"></div>
 <div id="toast"></div>
+<div id="dz"><div>أفلت الملفات هنا للرفع</div></div>
+<div id="lb"><button class="x"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+ <button class="nav l"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+ <img id="lbi" alt=""><button class="nav r"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button><div class="cap" id="lbc"></div></div>
+
 <script>
-// ====== ضع بيانات مشروعك هنا ======
+// ====== بيانات مشروعك ======
 const SUPABASE_URL = "https://ieqvkshxiyeukvhxgroz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_i7-HFzfqcnkb0RiLzVPrSg_Q7izkKYd";
-// ==================================
+// ==========================
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
-let secs = [], cur = null;
-try{cur = localStorage.getItem("jisr_sec")}catch(e){}
+const COLORS = ["#6366f1","#ec4899","#10b981","#f59e0b","#06b6d4","#ef4444","#8b5cf6","#84cc16"];
+const ICONS = {
+  copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/>',
+  dl:'<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',
+  del:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  pin:'<path d="M9 3h6l-1 6 3 3H7l3-3-1-6zM12 12v9"/>',
+  open:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16v4zM13 7l4 4"/>',
+  chk:'<path d="M5 12l5 5L20 7"/>',
+  inbox:'<path d="M3 13l3-8h12l3 8v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM3 13h5l1 3h6l1-3h5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>'
+};
+const ic = n => `<svg viewBox="0 0 24 24">${ICONS[n]}</svg>`;
+const esc = s => (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sz = n => n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
+const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let secs=[], cur=store.get("jisr_sec"), items=[], counts={}, sel=new Set(), q="", seen=new Set(), imgs=[], lbi=0;
 
-const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const toast = m => {const t=$("toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",1800)};
-const size = n => n>1048576?(n/1048576).toFixed(1)+" MB":Math.ceil(n/1024)+" KB";
-const linkify = s => esc(s).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+/* ---------- toast ---------- */
+let tt; function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2000)}
 
+/* ---------- theme ---------- */
+function applyTheme(){
+  const m=store.get("jisr_theme")||"auto";
+  const dark = m==="dark"||(m==="auto"&&matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.dataset.theme = dark?"dark":"light";
+  $("themeIc").innerHTML = ICONS[dark?"moon":"sun"];
+  $("themeTx").textContent = m==="auto"?"المظهر: تلقائي":dark?"المظهر: غامق":"المظهر: فاتح";
+}
+$("theme").onclick=()=>{const o=["auto","light","dark"];const m=store.get("jisr_theme")||"auto";store.set("jisr_theme",o[(o.indexOf(m)+1)%3]);applyTheme()};
+matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",applyTheme);
+applyTheme();
+
+/* ---------- ripple ---------- */
+document.addEventListener("pointerdown",e=>{
+  const b=e.target.closest(".btn.p"); if(!b) return;
+  const r=b.getBoundingClientRect(),s=Math.max(r.width,r.height),d=document.createElement("span");
+  d.className="rip";d.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px`;
+  b.appendChild(d);setTimeout(()=>d.remove(),600);
+});
+
+/* ---------- sections ---------- */
+const colorOf=(s,i)=>s.color||COLORS[i%COLORS.length];
 async function loadSecs(){
-  const {data,error} = await sb.from("sections").select("*").order("created_at");
-  if(error){toast("خطأ: تأكد من المفاتيح");console.error(error);return}
-  secs = data;
-  if(!secs.find(s=>s.id===cur)) cur = secs[0]?.id;
-  renderSecs(); loadItems();
+  const {data,error}=await sb.from("sections").select("*").order("created_at");
+  if(error){toast("خطأ بالاتصال، تأكد من المفاتيح");console.error(error);return}
+  secs=data;
+  if(!secs.find(s=>s.id===cur)) cur=secs[0]?.id;
+  const c=await sb.from("items").select("section_id");
+  counts={}; (c.data||[]).forEach(r=>counts[r.section_id]=(counts[r.section_id]||0)+1);
+  renderSecs(); loadItems(true);
 }
 function renderSecs(){
-  $("secs").innerHTML = secs.map(s=>`<div class="sec ${s.id===cur?"on":""}" onclick="pick('${s.id}')"><span>${esc(s.name)}</span><span><button onclick="event.stopPropagation();renSec('${s.id}')">✏️</button><button onclick="event.stopPropagation();delSec('${s.id}')">🗑</button></span></div>`).join("");
-  $("title").textContent = secs.find(s=>s.id===cur)?.name || "";
+  $("secs").innerHTML=secs.map((s,i)=>`<div class="sec ${s.id===cur?"on":""}" data-id="${s.id}" style="animation-delay:${i*35}ms">
+    <span class="dot" style="background:${colorOf(s,i)};color:${colorOf(s,i)}"></span><span class="nm">${esc(s.name)}</span>
+    <span class="cnt">${counts[s.id]||0}</span>
+    <span class="tools"><button class="mini" data-ren="${s.id}">${ic("edit")}</button><button class="mini" data-delsec="${s.id}">${ic("del")}</button></span></div>`).join("");
+  $("title").textContent=secs.find(s=>s.id===cur)?.name||"";
 }
-function pick(id){cur=id;try{localStorage.setItem("jisr_sec",id)}catch(e){};side.classList.remove("open");renderSecs();loadItems()}
+$("secs").onclick=e=>{
+  const r=e.target.closest("[data-ren]"),d=e.target.closest("[data-delsec]");
+  if(r) return renSec(r.dataset.ren); if(d) return delSec(d.dataset.delsec);
+  const s=e.target.closest(".sec"); if(s) pick(s.dataset.id);
+};
+function pick(id){if(id===cur){closeSide();return}cur=id;store.set("jisr_sec",id);sel.clear();q="";$("q").value="";closeSide();renderSecs();loadItems(true)}
 async function addSec(){
-  const n = prompt("اسم القسم الجديد:"); if(!n) return;
-  const {data} = await sb.from("sections").insert({name:n.trim()}).select().single();
-  cur = data.id; loadSecs();
+  const n=prompt("اسم القسم الجديد:"); if(!n?.trim()) return;
+  const {data,error}=await sb.from("sections").insert({name:n.trim(),color:COLORS[secs.length%COLORS.length]}).select().single();
+  if(error){const r=await sb.from("sections").insert({name:n.trim()}).select().single();if(r.error)return toast("تعذر إنشاء القسم");cur=r.data.id}else cur=data.id;
+  store.set("jisr_sec",cur); loadSecs();
 }
+$("addSec").onclick=addSec;
 async function renSec(id){
-  const s = secs.find(x=>x.id===id); const n = prompt("الاسم الجديد:",s.name); if(!n) return;
+  const s=secs.find(x=>x.id===id); const n=prompt("الاسم الجديد:",s.name); if(!n?.trim()) return;
   await sb.from("sections").update({name:n.trim()}).eq("id",id); loadSecs();
 }
 async function delSec(id){
-  if(!confirm("حذف القسم وكل محتوياته؟")) return;
-  const {data} = await sb.from("items").select("file_path").eq("section_id",id).not("file_path","is",null);
+  if(!confirm("حذف القسم وكل محتوياته؟ لا يمكن التراجع.")) return;
+  const {data}=await sb.from("items").select("file_path").eq("section_id",id).not("file_path","is",null);
   if(data?.length) await sb.storage.from("jisr").remove(data.map(d=>d.file_path));
-  await sb.from("sections").delete().eq("id",id); cur=null; loadSecs();
+  await sb.from("sections").delete().eq("id",id); if(cur===id)cur=null; loadSecs();
 }
+const openSide=()=>{$("side").classList.add("open");$("back").classList.add("on")};
+const closeSide=()=>{$("side").classList.remove("open");$("back").classList.remove("on")};
+$("menu").onclick=openSide; $("back").onclick=closeSide;
 
-async function loadItems(){
-  if(!cur){$("list").innerHTML="";return}
-  const {data} = await sb.from("items").select("*").eq("section_id",cur).order("created_at",{ascending:false});
-  $("list").innerHTML = (data||[]).map(it=>{
-    const d = new Date(it.created_at).toLocaleString("ar-IQ");
-    if(it.kind==="text") return `<div class="it"><div class="t">${linkify(it.content)}</div><div class="meta">${d}</div><div class="acts"><button onclick="copyT('${it.id}')">نسخ</button><button onclick="delIt('${it.id}')">حذف</button></div></div>`;
-    const url = sb.storage.from("jisr").getPublicUrl(it.file_path).data.publicUrl;
-    const img = (it.file_type||"").startsWith("image/");
-    return `<div class="it">${img?`<img src="${url}" loading="lazy">`:""}<div>📄 ${esc(it.file_name)}</div><div class="meta">${size(it.file_size)} · ${d}</div><div class="acts"><button class="p" onclick="dl('${url}','${esc(it.file_name).replace(/'/g,"")}')">تنزيل</button><button onclick="window.open('${url}')">فتح</button><button onclick="delIt('${it.id}')">حذف</button></div></div>`;
-  }).join("") || '<div class="meta">لا يوجد شي بعد</div>';
-  window._items = data||[];
+/* ---------- items ---------- */
+const BADGE={pdf:["#e5484d","PDF"],doc:["#2b6cdf","DOC"],docx:["#2b6cdf","DOC"],xls:["#1f9d63","XLS"],xlsx:["#1f9d63","XLS"],csv:["#1f9d63","CSV"],
+  ppt:["#e8702a","PPT"],pptx:["#e8702a","PPT"],zip:["#d99a1b","ZIP"],rar:["#d99a1b","RAR"],"7z":["#d99a1b","7Z"],txt:["#6b7385","TXT"],
+  mp3:["#9b5de5","MP3"],mp4:["#9b5de5","MP4"],apk:["#3ddc84","APK"],json:["#6b7385","JSON"]};
+function badge(name){const e=(name.split(".").pop()||"").toLowerCase();const b=BADGE[e]||["#6b7385",(e||"FILE").slice(0,4).toUpperCase()];
+  return `<div class="badge" style="background:${b[0]}">${esc(b[1])}</div>`}
+const rtf=new Intl.RelativeTimeFormat("ar",{numeric:"auto"});
+function ago(d){const s=(new Date(d)-Date.now())/1000,a=Math.abs(s);
+  if(a<60)return"الآن";if(a<3600)return rtf.format(Math.round(s/60),"minute");if(a<86400)return rtf.format(Math.round(s/3600),"hour");
+  if(a<2592000)return rtf.format(Math.round(s/86400),"day");return new Date(d).toLocaleDateString("ar-IQ")}
+const urlOf=p=>sb.storage.from("jisr").getPublicUrl(p).data.publicUrl;
+function host(u){try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return null}}
+
+async function loadItems(first){
+  if(!cur){items=[];renderList(true);return}
+  if(first){$("list").innerHTML='<div class="sk"></div><div class="sk" style="animation-delay:.15s"></div><div class="sk" style="animation-delay:.3s"></div>'}
+  const {data}=await sb.from("items").select("*").eq("section_id",cur).order("created_at",{ascending:false});
+  items=data||[]; counts[cur]=items.length;
+  document.querySelector(`.sec[data-id="${cur}"] .cnt`)&&(document.querySelector(`.sec[data-id="${cur}"] .cnt`).textContent=items.length);
+  renderList(first);
 }
-function copyT(id){navigator.clipboard.writeText(_items.find(i=>i.id===id).content).then(()=>toast("تم النسخ"))}
-async function dl(url,name){
-  const b = await (await fetch(url)).blob(); const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href);
+function view(){
+  const k=q.trim().toLowerCase();
+  let v=items.filter(i=>!k||(i.content||"").toLowerCase().includes(k)||(i.file_name||"").toLowerCase().includes(k));
+  return v.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created_at)-new Date(a.created_at));
 }
-async function delIt(id){
-  const it = _items.find(i=>i.id===id);
-  if(it.file_path) await sb.storage.from("jisr").remove([it.file_path]);
-  await sb.from("items").delete().eq("id",id); loadItems();
+function renderList(all){
+  const v=view(); imgs=v.filter(i=>(i.file_type||"").startsWith("image/"));
+  if(!v.length){$("list").innerHTML=`<div class="empty"><div class="em">${ic("inbox")}</div><div style="font-weight:600;color:var(--tx);margin-bottom:4px">${q?"ما لقينا شي":"القسم فارغ"}</div>${q?"جرّب كلمة ثانية":"الصق نص أو ارفع ملف للبداية"}</div>`;seen=new Set();updBulk();return}
+  let n=0;
+  $("list").innerHTML=v.map(it=>{
+    const fresh=all||!seen.has(it.id), d=fresh?`style="animation-delay:${Math.min(n++,12)*45}ms"`:"";
+    const cls=`it ${fresh?"in":""} ${sel.has(it.id)?"sel":""} ${it.pinned?"pin":""}`;
+    const head=`<span class="pinb">${ic("pin")}</span><button class="chk" data-sel="${it.id}">${ic("chk")}</button>`;
+    const pin=`<button class="btn sm" data-a="pin" data-id="${it.id}">${ic("pin")}${it.pinned?"إلغاء التثبيت":"تثبيت"}</button>`;
+    const del=`<button class="btn sm danger" data-a="del" data-id="${it.id}">${ic("del")}حذف</button>`;
+    if(it.kind==="text"){
+      const u=(it.content.match(/https?:\/\/[^\s]+/)||[])[0], h=u&&host(u);
+      const html=esc(it.content).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+      return `<div class="${cls}" ${d} data-id="${it.id}">${head}<div class="t">${html}</div>
+        ${h?`<a class="lk" href="${esc(u)}" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=${h}&sz=64" alt="" onerror="this.style.display='none'"><span>${esc(h)}</span></a>`:""}
+        <div class="meta">${ago(it.created_at)}</div>
+        <div class="acts"><button class="btn sm" data-a="copy" data-id="${it.id}">${ic("copy")}نسخ</button>${pin}${del}</div></div>`;
+    }
+    const u=urlOf(it.file_path), im=(it.file_type||"").startsWith("image/");
+    return `<div class="${cls}" ${d} data-id="${it.id}">${head}
+      ${im?`<img class="thumb" src="${u}" loading="lazy" data-lb="${it.id}" alt="">`:""}
+      <div class="file">${im?"":badge(it.file_name)}<div style="min-width:0"><div class="fn">${esc(it.file_name)}</div><div class="meta">${sz(it.file_size)} · ${ago(it.created_at)}</div></div></div>
+      <div class="acts"><button class="btn sm p" data-a="dl" data-id="${it.id}">${ic("dl")}تنزيل</button><button class="btn sm" data-a="open" data-id="${it.id}">${ic("open")}فتح</button>${pin}${del}</div></div>`;
+  }).join("");
+  seen=new Set(v.map(i=>i.id)); updBulk();
 }
+$("q").oninput=e=>{q=e.target.value;renderList(true)};
+
+/* ---------- item actions ---------- */
+const byId=id=>items.find(i=>i.id===id);
+async function download(it){
+  try{const b=await (await fetch(urlOf(it.file_path))).blob();const a=document.createElement("a");
+    a.href=URL.createObjectURL(b);a.download=it.file_name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+  catch(e){window.open(urlOf(it.file_path))}
+}
+async function remove(ids){
+  ids.forEach(id=>document.querySelector(`.it[data-id="${id}"]`)?.classList.add("out"));
+  await new Promise(r=>setTimeout(r,280));
+  const files=ids.map(byId).filter(i=>i?.file_path).map(i=>i.file_path);
+  if(files.length) await sb.storage.from("jisr").remove(files);
+  await sb.from("items").delete().in("id",ids); ids.forEach(i=>sel.delete(i)); loadItems();
+}
+$("list").onclick=async e=>{
+  const s=e.target.closest("[data-sel]"); if(s){toggleSel(s.dataset.sel);return}
+  const l=e.target.closest("[data-lb]"); if(l){openLb(l.dataset.lb);return}
+  const b=e.target.closest("[data-a]"); if(!b) return;
+  const it=byId(b.dataset.id), a=b.dataset.a; if(!it) return;
+  if(a==="copy"){await navigator.clipboard.writeText(it.content);toast("تم النسخ ✓")}
+  if(a==="dl") download(it);
+  if(a==="open") window.open(urlOf(it.file_path),"_blank");
+  if(a==="del") remove([it.id]);
+  if(a==="pin"){const {error}=await sb.from("items").update({pinned:!it.pinned}).eq("id",it.id);if(error)toast("شغّل تحديث SQL للتثبيت");else loadItems()}
+};
+function toggleSel(id){sel.has(id)?sel.delete(id):sel.add(id);document.querySelector(`.it[data-id="${id}"]`)?.classList.toggle("sel",sel.has(id));updBulk()}
+function updBulk(){const n=sel.size;$("bulk").classList.toggle("on",n>0);$("list").classList.toggle("selmode",n>0);$("bn").textContent=n+" محدد"}
+$("bulk").onclick=async e=>{
+  const b=e.target.closest("[data-b]"); if(!b) return; const ids=[...sel], its=ids.map(byId).filter(Boolean), k=b.dataset.b;
+  if(k==="x"){sel.clear();document.querySelectorAll(".it.sel").forEach(x=>x.classList.remove("sel"));updBulk()}
+  if(k==="dl"){for(const it of its.filter(i=>i.file_path)){await download(it);await new Promise(r=>setTimeout(r,350))}toast("تم التنزيل ✓")}
+  if(k==="cp"){await navigator.clipboard.writeText(its.filter(i=>i.kind==="text").map(i=>i.content).join("\n\n"));toast("تم نسخ النصوص ✓")}
+  if(k==="del"&&confirm(`حذف ${ids.length} عنصر؟`)) remove(ids);
+};
+
+/* ---------- send text ---------- */
 async function sendText(){
-  const v = $("txt").value.trim(); if(!v||!cur) return;
-  await sb.from("items").insert({section_id:cur,kind:"text",content:v});
-  $("txt").value=""; loadItems();
+  const v=$("txt").value.trim(); if(!v||!cur) return;
+  $("txt").value=""; autosize();
+  const {error}=await sb.from("items").insert({section_id:cur,kind:"text",content:v});
+  if(error){toast("تعذر الإرسال");$("txt").value=v;return}
+  toast("تم الإرسال ✓"); loadItems();
+}
+$("send").onclick=sendText;
+$("txt").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendText()}});
+const autosize=()=>{const t=$("txt");t.style.height="auto";t.style.height=Math.min(t.scrollHeight,240)+"px"};
+$("txt").addEventListener("input",autosize);
+
+/* ---------- upload with progress ---------- */
+function xhrUpload(path,file,onp){
+  return new Promise((res,rej)=>{
+    const x=new XMLHttpRequest();
+    x.open("POST",`${SUPABASE_URL}/storage/v1/object/jisr/${encodeURIComponent(path)}`);
+    x.setRequestHeader("apikey",SUPABASE_KEY);
+    x.setRequestHeader("Content-Type",file.type||"application/octet-stream");
+    x.upload.onprogress=e=>e.lengthComputable&&onp(e.loaded/e.total);
+    x.onload=()=>x.status<300?res():rej(new Error(x.responseText));
+    x.onerror=()=>rej(new Error("network"));
+    x.send(file);
+  });
 }
 async function upload(files){
   if(!cur) return toast("اختر قسم أولاً");
+  const target=cur;
   for(const f of files){
     if(f.size>52428800){toast(f.name+" أكبر من 50MB");continue}
-    toast("جاري الرفع: "+f.name);
-    const path = crypto.randomUUID()+"-"+f.name.replace(/[^\w.\-]/g,"_");
-    const {error} = await sb.storage.from("jisr").upload(path,f,{contentType:f.type});
-    if(error){toast("فشل: "+f.name);console.error(error);continue}
-    await sb.from("items").insert({section_id:cur,kind:"file",file_path:path,file_name:f.name,file_type:f.type,file_size:f.size});
+    const el=document.createElement("div");el.className="up";
+    el.innerHTML=`<div class="r"><span>${esc(f.name)}</span><span>0%</span></div><div class="bar"><i></i></div>`;
+    $("ups").appendChild(el);
+    const path=crypto.randomUUID()+"-"+f.name.replace(/[^\w.\-]/g,"_");
+    const prog=p=>{el.querySelector("i").style.width=(p*100)+"%";el.querySelector(".r span:last-child").textContent=Math.round(p*100)+"%"};
+    try{
+      try{await xhrUpload(path,f,prog)}
+      catch(e){const {error}=await sb.storage.from("jisr").upload(path,f,{contentType:f.type});if(error)throw error;prog(1)}
+      const {error}=await sb.from("items").insert({section_id:target,kind:"file",file_path:path,file_name:f.name,file_type:f.type,file_size:f.size});
+      if(error)throw error;
+      el.classList.add("done");setTimeout(()=>el.remove(),1500);
+    }catch(e){console.error(e);el.querySelector(".r span:last-child").textContent="فشل";setTimeout(()=>el.remove(),3000)}
+    if(target===cur) loadItems();
   }
-  toast("تم الرفع ✓"); loadItems();
 }
-$("fi").onchange = e => {upload([...e.target.files]);e.target.value=""};
-const dr=$("drop");
-["dragover","dragenter"].forEach(ev=>dr.addEventListener(ev,e=>{e.preventDefault();dr.classList.add("o")}));
-["dragleave","drop"].forEach(ev=>dr.addEventListener(ev,e=>{e.preventDefault();dr.classList.remove("o")}));
-dr.addEventListener("drop",e=>upload([...e.dataTransfer.files]));
-document.addEventListener("paste",e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();upload(fs)}});
+$("pick").onclick=()=>$("fi").click();
+$("fi").onchange=e=>{upload([...e.target.files]);e.target.value=""};
+let dc=0;
+addEventListener("dragenter",e=>{if(e.dataTransfer?.types?.includes("Files")){dc++;$("dz").classList.add("on")}});
+addEventListener("dragleave",()=>{if(--dc<=0){dc=0;$("dz").classList.remove("on")}});
+addEventListener("dragover",e=>e.preventDefault());
+addEventListener("drop",e=>{e.preventDefault();dc=0;$("dz").classList.remove("on");if(e.dataTransfer.files.length)upload([...e.dataTransfer.files])});
+addEventListener("paste",e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();upload(fs)}});
 
-sb.channel("jisr").on("postgres_changes",{event:"*",schema:"public",table:"items"},loadItems)
-  .on("postgres_changes",{event:"*",schema:"public",table:"sections"},loadSecs).subscribe();
-setInterval(loadItems,15000);
+/* ---------- lightbox ---------- */
+function showLb(){const it=imgs[lbi];if(!it)return;const im=$("lbi");im.style.opacity=0;setTimeout(()=>{im.src=urlOf(it.file_path);im.style.opacity=1},120);$("lbc").textContent=`${lbi+1} / ${imgs.length} · ${it.file_name}`}
+function openLb(id){lbi=Math.max(0,imgs.findIndex(i=>i.id===id));$("lb").classList.add("on");showLb()}
+const closeLb=()=>$("lb").classList.remove("on");
+const stepLb=d=>{lbi=(lbi+d+imgs.length)%imgs.length;showLb()};
+$("lb").onclick=e=>{if(e.target.closest(".x")||e.target===$("lb"))closeLb();else if(e.target.closest(".l"))stepLb(1);else if(e.target.closest(".r"))stepLb(-1)};
+addEventListener("keydown",e=>{if(!$("lb").classList.contains("on")){if(e.key==="Escape"&&sel.size){sel.clear();renderList(false)}return}
+  if(e.key==="Escape")closeLb();if(e.key==="ArrowLeft")stepLb(1);if(e.key==="ArrowRight")stepLb(-1)});
+let tx=null;$("lb").addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+$("lb").addEventListener("touchend",e=>{if(tx==null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)stepLb(d<0?1:-1);tx=null});
+
+/* ---------- live + init ---------- */
+let rt;const later=f=>{clearTimeout(rt);rt=setTimeout(f,250)};
+sb.channel("jisr")
+  .on("postgres_changes",{event:"*",schema:"public",table:"items"},()=>later(()=>loadItems()))
+  .on("postgres_changes",{event:"*",schema:"public",table:"sections"},()=>later(loadSecs)).subscribe();
+setInterval(()=>{if(!document.hidden)loadItems()},20000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadItems()});
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
 loadSecs();
 </script>
 </body>
