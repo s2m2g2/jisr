@@ -24,7 +24,8 @@
   --ac:#818cf8;--ac2:#a78bfa;--acs:#1e2240;--dn:#ff6b70;--sh:0 1px 2px #0006,0 8px 24px -12px #000a;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overscroll-behavior-y:contain}
+html,body{overscroll-behavior:none}
 body{margin:0;font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);
   transition:background .35s var(--ease),color .35s var(--ease);-webkit-font-smoothing:antialiased}
 svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -425,15 +426,18 @@ $("bulk").onclick=async e=>{
 /* ---------- send text ---------- */
 async function sendText(){
   const v=$("txt").value.trim(); if(!v||!cur) return;
-  $("txt").value=""; autosize();
+  $("txt").value=""; autosize(); store.set("jisr_draft","");
   const {error}=await sb.from("items").insert({section_id:cur,kind:"text",content:v});
-  if(error){toast("تعذر الإرسال");$("txt").value=v;return}
+  if(error){toast("تعذر الإرسال");$("txt").value=v;store.set("jisr_draft",v);autosize();return}
   toast("تم الإرسال ✓"); loadItems();
 }
 $("send").onclick=sendText;
 $("txt").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendText()}});
 const autosize=()=>{const t=$("txt");t.style.height="auto";t.style.height=Math.min(t.scrollHeight,240)+"px"};
 $("txt").addEventListener("input",autosize);
+/* حفظ المسودة تلقائياً */
+$("txt").value=store.get("jisr_draft")||""; autosize();
+$("txt").addEventListener("input",()=>store.set("jisr_draft",$("txt").value));
 
 /* ---------- upload with progress ---------- */
 function xhrUpload(path,file,onp){
