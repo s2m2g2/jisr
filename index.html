@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>جسر</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#6b7280;--br:#e5e7eb;--ac:#2563eb}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#181b21;--tx:#e8eaed;--mu:#9aa0a6;--br:#2a2f38;--ac:#60a5fa}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--tx)}
+.app{display:flex;min-height:100vh}
+aside{width:240px;background:var(--card);border-left:1px solid var(--br);padding:16px;position:sticky;top:0;height:100vh;overflow:auto}
+h1{margin:0 0 14px;font-size:22px}
+.sec{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:4px}
+.sec:hover{background:var(--bg)}.sec.on{background:var(--ac);color:#fff}
+.sec button{opacity:.6}
+main{flex:1;padding:20px;max-width:860px;margin:0 auto;width:100%}
+button{font:inherit;border:1px solid var(--br);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:10px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sec button{background:none;border:0;color:inherit;padding:0 4px}
+textarea{width:100%;min-height:90px;padding:12px;border-radius:12px;border:1px solid var(--br);background:var(--card);color:var(--tx);font:inherit;resize:vertical}
+.row{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.drop{border:2px dashed var(--br);border-radius:12px;padding:16px;text-align:center;color:var(--mu);margin:10px 0}
+.drop.o{border-color:var(--ac);color:var(--ac)}
+.it{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:12px;margin-bottom:10px}
+.it .t{white-space:pre-wrap;word-break:break-word}
+.it img{max-width:100%;max-height:320px;border-radius:8px;display:block;margin-bottom:8px}
+.meta{color:var(--mu);font-size:12px;margin-top:6px}
+.acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.acts button{padding:5px 10px;font-size:13px}
+a{color:var(--ac)}
+#menu{display:none}
+@media(max-width:700px){
+ aside{position:fixed;right:0;z-index:5;transform:translateX(100%);transition:.2s;box-shadow:0 0 30px #0005}
+ aside.open{transform:none}
+ #menu{display:inline-block}
+}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:8px 16px;border-radius:20px;display:none}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside id="side">
+  <h1>🌉 جسر</h1>
+  <div id="secs"></div>
+  <button class="p" style="width:100%;margin-top:10px" onclick="addSec()">+ قسم جديد</button>
+ </aside>
+ <main>
+  <div class="row" style="justify-content:space-between;align-items:center">
+   <button id="menu" onclick="side.classList.toggle('open')">☰ الأقسام</button>
+   <h2 id="title" style="margin:0"></h2>
+  </div>
+  <textarea id="txt" placeholder="الصق نص أو رابط هنا... (تقدر تلصق صورة أيضاً)"></textarea>
+  <div class="row">
+   <button class="p" onclick="sendText()">إرسال النص</button>
+   <button onclick="fi.click()">📎 رفع ملفات</button>
+   <input type="file" id="fi" multiple hidden>
+  </div>
+  <div class="drop" id="drop">أو اسحب الملفات وأفلتها هنا</div>
+  <div id="list"></div>
+ </main>
+</div>
+<div id="toast"></div>
+<script>
+// ====== ضع بيانات مشروعك هنا ======
+const SUPABASE_URL = "https://ieqvkshxiyeukvhxgroz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_i7-HFzfqcnkb0RiLzVPrSg_Q7izkKYd";
+// ==================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+let secs = [], cur = null;
+try{cur = localStorage.getItem("jisr_sec")}catch(e){}
+
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const toast = m => {const t=$("toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",1800)};
+const size = n => n>1048576?(n/1048576).toFixed(1)+" MB":Math.ceil(n/1024)+" KB";
+const linkify = s => esc(s).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+
+async function loadSecs(){
+  const {data,error} = await sb.from("sections").select("*").order("created_at");
+  if(error){toast("خطأ: تأكد من المفاتيح");console.error(error);return}
+  secs = data;
+  if(!secs.find(s=>s.id===cur)) cur = secs[0]?.id;
+  renderSecs(); loadItems();
+}
+function renderSecs(){
+  $("secs").innerHTML = secs.map(s=>`<div class="sec ${s.id===cur?"on":""}" onclick="pick('${s.id}')"><span>${esc(s.name)}</span><span><button onclick="event.stopPropagation();renSec('${s.id}')">✏️</button><button onclick="event.stopPropagation();delSec('${s.id}')">🗑</button></span></div>`).join("");
+  $("title").textContent = secs.find(s=>s.id===cur)?.name || "";
+}
+function pick(id){cur=id;try{localStorage.setItem("jisr_sec",id)}catch(e){};side.classList.remove("open");renderSecs();loadItems()}
+async function addSec(){
+  const n = prompt("اسم القسم الجديد:"); if(!n) return;
+  const {data} = await sb.from("sections").insert({name:n.trim()}).select().single();
+  cur = data.id; loadSecs();
+}
+async function renSec(id){
+  const s = secs.find(x=>x.id===id); const n = prompt("الاسم الجديد:",s.name); if(!n) return;
+  await sb.from("sections").update({name:n.trim()}).eq("id",id); loadSecs();
+}
+async function delSec(id){
+  if(!confirm("حذف القسم وكل محتوياته؟")) return;
+  const {data} = await sb.from("items").select("file_path").eq("section_id",id).not("file_path","is",null);
+  if(data?.length) await sb.storage.from("jisr").remove(data.map(d=>d.file_path));
+  await sb.from("sections").delete().eq("id",id); cur=null; loadSecs();
+}
+
+async function loadItems(){
+  if(!cur){$("list").innerHTML="";return}
+  const {data} = await sb.from("items").select("*").eq("section_id",cur).order("created_at",{ascending:false});
+  $("list").innerHTML = (data||[]).map(it=>{
+    const d = new Date(it.created_at).toLocaleString("ar-IQ");
+    if(it.kind==="text") return `<div class="it"><div class="t">${linkify(it.content)}</div><div class="meta">${d}</div><div class="acts"><button onclick="copyT('${it.id}')">نسخ</button><button onclick="delIt('${it.id}')">حذف</button></div></div>`;
+    const url = sb.storage.from("jisr").getPublicUrl(it.file_path).data.publicUrl;
+    const img = (it.file_type||"").startsWith("image/");
+    return `<div class="it">${img?`<img src="${url}" loading="lazy">`:""}<div>📄 ${esc(it.file_name)}</div><div class="meta">${size(it.file_size)} · ${d}</div><div class="acts"><button class="p" onclick="dl('${url}','${esc(it.file_name).replace(/'/g,"")}')">تنزيل</button><button onclick="window.open('${url}')">فتح</button><button onclick="delIt('${it.id}')">حذف</button></div></div>`;
+  }).join("") || '<div class="meta">لا يوجد شي بعد</div>';
+  window._items = data||[];
+}
+function copyT(id){navigator.clipboard.writeText(_items.find(i=>i.id===id).content).then(()=>toast("تم النسخ"))}
+async function dl(url,name){
+  const b = await (await fetch(url)).blob(); const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+async function delIt(id){
+  const it = _items.find(i=>i.id===id);
+  if(it.file_path) await sb.storage.from("jisr").remove([it.file_path]);
+  await sb.from("items").delete().eq("id",id); loadItems();
+}
+async function sendText(){
+  const v = $("txt").value.trim(); if(!v||!cur) return;
+  await sb.from("items").insert({section_id:cur,kind:"text",content:v});
+  $("txt").value=""; loadItems();
+}
+async function upload(files){
+  if(!cur) return toast("اختر قسم أولاً");
+  for(const f of files){
+    if(f.size>52428800){toast(f.name+" أكبر من 50MB");continue}
+    toast("جاري الرفع: "+f.name);
+    const path = crypto.randomUUID()+"-"+f.name.replace(/[^\w.\-]/g,"_");
+    const {error} = await sb.storage.from("jisr").upload(path,f,{contentType:f.type});
+    if(error){toast("فشل: "+f.name);console.error(error);continue}
+    await sb.from("items").insert({section_id:cur,kind:"file",file_path:path,file_name:f.name,file_type:f.type,file_size:f.size});
+  }
+  toast("تم الرفع ✓"); loadItems();
+}
+$("fi").onchange = e => {upload([...e.target.files]);e.target.value=""};
+const dr=$("drop");
+["dragover","dragenter"].forEach(ev=>dr.addEventListener(ev,e=>{e.preventDefault();dr.classList.add("o")}));
+["dragleave","drop"].forEach(ev=>dr.addEventListener(ev,e=>{e.preventDefault();dr.classList.remove("o")}));
+dr.addEventListener("drop",e=>upload([...e.dataTransfer.files]));
+document.addEventListener("paste",e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();upload(fs)}});
+
+sb.channel("jisr").on("postgres_changes",{event:"*",schema:"public",table:"items"},loadItems)
+  .on("postgres_changes",{event:"*",schema:"public",table:"sections"},loadSecs).subscribe();
+setInterval(loadItems,15000);
+loadSecs();
+</script>
+</body>
+</html>
