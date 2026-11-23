@@ -24,8 +24,10 @@
   --ac:#818cf8;--ac2:#a78bfa;--acs:#1e2240;--dn:#ff6b70;--sh:0 1px 2px #0006,0 8px 24px -12px #000a;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth;overscroll-behavior-y:contain}
-html,body{overscroll-behavior:none}
+html{scroll-behavior:smooth}
+@media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){
+  html,body{overscroll-behavior-y:contain}
+}
 body{margin:0;font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);
   transition:background .35s var(--ease),color .35s var(--ease);-webkit-font-smoothing:antialiased}
 svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
