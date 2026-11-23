@@ -166,6 +166,11 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 
 #back{position:fixed;inset:0;background:#0007;z-index:35;opacity:0;pointer-events:none;transition:opacity .3s;display:none}
 
+.sig{margin-top:56px;text-align:center;animation:fade 1.4s .6s var(--ease) both}
+.sig::before{content:"";display:block;height:1px;max-width:320px;margin:0 auto 18px;background:linear-gradient(90deg,transparent,var(--br),transparent)}
+.sig span{display:inline-block;font-size:12px;font-weight:400;letter-spacing:.14em;color:var(--mu);opacity:.6;direction:ltr;unicode-bidi:isolate;
+  transition:opacity .4s var(--ease),letter-spacing .5s var(--ease);cursor:default}
+.sig span:hover{opacity:1;letter-spacing:.18em}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -217,6 +222,7 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
   </div>
   <input type="file" id="fi" multiple hidden>
   <div id="list"></div>
+  <footer class="sig"><span>© 2027 · Suhaib Mohammed</span></footer>
  </main>
 </div>
 
