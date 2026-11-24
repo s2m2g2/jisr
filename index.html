@@ -107,7 +107,7 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .chk svg{width:13px;height:13px;stroke-width:3}
 .chk{box-shadow:0 2px 8px #0003}.body{padding-inline-start:0}
 .selmode .it .body,.it:hover .body{}
-.t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding-inline:36px 30px;min-height:24px}
+.t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding:0 40px 0 34px;min-height:24px;unicode-bidi:plaintext}
 .code{margin:8px 0;border-radius:12px;overflow:hidden;background:#0d1117;border:1px solid #232a36;direction:ltr;text-align:left}
 .t+.code,.code+.t{margin-top:10px}
 .code .ch{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 6px 12px;background:#161b24;color:#8b95a7;font-size:12px;
@@ -126,7 +126,8 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .thumb{width:100%;max-height:340px;object-fit:cover;border-radius:12px;display:block;margin-bottom:12px;cursor:zoom-in;background:var(--card2);
   transition:transform .4s var(--ease),filter .3s;min-height:80px}
 .thumb:hover{filter:brightness(1.05)}
-.file{display:flex;align-items:center;gap:12px;padding-inline:36px 30px}
+.file{display:flex;align-items:center;gap:12px;padding:0 40px 0 34px}
+.fn{unicode-bidi:plaintext}
 .badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none;letter-spacing:.3px}
 .fn{font-weight:500;word-break:break-all;line-height:1.5}
 .meta{color:var(--mu);font-size:12.5px;margin-top:3px}
@@ -226,7 +227,7 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
    <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" placeholder="بحث..." autocomplete="off"></label>
   </div>
   <div class="composer">
-   <textarea id="txt" placeholder="الصق نص أو رابط، أو صورة من الحافظة..." rows="2"></textarea>
+   <textarea id="txt" dir="auto"placeholder="الصق نص أو رابط، أو صورة من الحافظة..." rows="2"></textarea>
    <div class="crow">
     <div style="display:flex;gap:8px"><button class="btn sm" id="pick"><svg viewBox="0 0 24 24"><path d="M21 12l-9 9a6 6 0 01-8.5-8.5l9-9a4 4 0 015.7 5.7l-9 9a2 2 0 01-2.8-2.8l8.3-8.3"/></svg>رفع ملفات</button></div>
     <span class="hint">Ctrl+Enter للإرسال</span>
@@ -409,7 +410,7 @@ function renderList(all){
       const u=(plain.match(/https?:\/\/[^\s]+/)||[])[0], h=u&&host(u);
       const html=segs.map((s,si)=>s.code
         ?`<div class="code"><div class="ch"><span>${esc(s.lang||"code")}</span><button class="cc" data-cc="${it.id}|${si}">${ic("copy")}نسخ الكود</button></div><pre>${esc(s.text)}</pre></div>`
-        :(s.text.trim()?`<div class="t">${esc(s.text.trim()).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}</div>`:"")).join("");
+        :(s.text.trim()?`<div class="t" dir="auto">${esc(s.text.trim()).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}</div>`:"")).join("");
       return `<div class="${cls}" ${d} data-id="${it.id}">${head}${html}
         ${h?`<a class="lk" href="${esc(u)}" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=${h}&sz=64" alt="" onerror="this.style.display='none'"><span>${esc(h)}</span></a>`:""}
         <div class="meta">${ago(it.created_at)}</div>
@@ -418,7 +419,7 @@ function renderList(all){
     const u=urlOf(it.file_path), im=(it.file_type||"").startsWith("image/");
     return `<div class="${cls}" ${d} data-id="${it.id}">${head}
       ${im?`<img class="thumb" src="${u}" loading="lazy" data-lb="${it.id}" alt="">`:""}
-      <div class="file">${im?"":badge(it.file_name)}<div style="min-width:0"><div class="fn">${esc(it.file_name)}</div><div class="meta">${sz(it.file_size)} · ${ago(it.created_at)}</div></div></div>
+      <div class="file">${im?"":badge(it.file_name)}<div style="min-width:0"><div class="fn" dir="auto">${esc(it.file_name)}</div><div class="meta">${sz(it.file_size)} · ${ago(it.created_at)}</div></div></div>
       <div class="acts"><button class="btn sm p" data-a="dl" data-id="${it.id}">${ic("dl")}تنزيل</button><button class="btn sm" data-a="open" data-id="${it.id}">${ic("open")}فتح</button>${pin}${del}</div></div>`;
   }).join("");
   seen=new Set(v.map(i=>i.id)); updBulk();
