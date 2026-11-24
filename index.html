@@ -105,9 +105,9 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .it:hover .chk,.selmode .chk{opacity:1;transform:none}
 .it.sel .chk{background:var(--ac);border-color:var(--ac);opacity:1;transform:none}
 .chk svg{width:13px;height:13px;stroke-width:3}
-.body{padding-inline-start:0}
+.chk{box-shadow:0 2px 8px #0003}.body{padding-inline-start:0}
 .selmode .it .body,.it:hover .body{}
-.t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding-inline-end:30px}
+.t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding-inline:36px 30px;min-height:24px}
 .t a{color:var(--ac);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--ac) 40%,transparent)}
 .lk{display:flex;align-items:center;gap:10px;background:var(--card2);padding:9px 12px;border-radius:12px;margin-top:10px;text-decoration:none;color:var(--tx);transition:background .2s}
 .lk:hover{background:var(--acs)}
@@ -116,7 +116,7 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .thumb{width:100%;max-height:340px;object-fit:cover;border-radius:12px;display:block;margin-bottom:12px;cursor:zoom-in;background:var(--card2);
   transition:transform .4s var(--ease),filter .3s;min-height:80px}
 .thumb:hover{filter:brightness(1.05)}
-.file{display:flex;align-items:center;gap:12px;padding-inline-end:30px}
+.file{display:flex;align-items:center;gap:12px;padding-inline:36px 30px}
 .badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none;letter-spacing:.3px}
 .fn{font-weight:500;word-break:break-all;line-height:1.5}
 .meta{color:var(--mu);font-size:12.5px;margin-top:3px}
