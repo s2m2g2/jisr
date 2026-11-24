@@ -26,7 +26,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 @media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){
-  html,body{overscroll-behavior-y:contain}
+  html{overscroll-behavior-y:contain}
 }
 body{margin:0;font-family:"IBM Plex Sans Arabic",system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);
   transition:background .35s var(--ease),color .35s var(--ease);-webkit-font-smoothing:antialiased}
@@ -74,7 +74,7 @@ aside{width:272px;flex:none;background:var(--card);border-left:1px solid var(--b
 .rip{position:absolute;border-radius:50%;background:#fff6;transform:scale(0);animation:rip .6s var(--ease) forwards;pointer-events:none}
 
 /* main */
-html,body{max-width:100%;overflow-x:hidden}
+body{overflow-x:clip}
 .app{max-width:100vw}
 main{flex:1;min-width:0;padding:22px clamp(14px,3vw,36px) 120px;max-width:900px;margin:0 auto;width:100%}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
