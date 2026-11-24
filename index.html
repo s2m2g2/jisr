@@ -74,6 +74,8 @@ aside{width:272px;flex:none;background:var(--card);border-left:1px solid var(--b
 .rip{position:absolute;border-radius:50%;background:#fff6;transform:scale(0);animation:rip .6s var(--ease) forwards;pointer-events:none}
 
 /* main */
+html,body{max-width:100%;overflow-x:hidden}
+.app{max-width:100vw}
 main{flex:1;min-width:0;padding:22px clamp(14px,3vw,36px) 120px;max-width:900px;margin:0 auto;width:100%}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 #title{margin:0;font-size:24px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:fade .4s var(--ease)}
@@ -90,7 +92,8 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .hint{font-size:12px;color:var(--mu)}
 
 /* items */
-#list{margin-top:20px;display:grid;gap:10px}
+#list{margin-top:20px;display:grid;gap:10px;grid-template-columns:minmax(0,1fr);min-width:0}
+#list>*{min-width:0;max-width:100%}
 .it{background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;box-shadow:var(--sh);position:relative;
   transition:transform .3s var(--ease),border-color .2s,box-shadow .3s,opacity .3s,max-height .3s;}
 .it:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--ac) 40%,var(--br))}
@@ -108,7 +111,7 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .chk{box-shadow:0 2px 8px #0003}.body{padding-inline-start:0}
 .selmode .it .body,.it:hover .body{}
 .t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding:0 40px 0 34px;min-height:24px;unicode-bidi:plaintext}
-.code{margin:8px 0;border-radius:12px;overflow:hidden;background:#0d1117;border:1px solid #232a36;direction:ltr;text-align:left}
+.code{max-width:100%;min-width:0;margin:8px 0;border-radius:12px;overflow:hidden;background:#0d1117;border:1px solid #232a36;direction:ltr;text-align:left}
 .t+.code,.code+.t{margin-top:10px}
 .code .ch{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 6px 12px;background:#161b24;color:#8b95a7;font-size:12px;
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -116,6 +119,13 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .code .cc:hover{background:#ffffff26}.code .cc:active{transform:scale(.94)}
 .code .cc.ok{background:#1f9d6340;color:#7ee2b0}
 .code .cc svg{width:13px;height:13px}
+.code .ch .g{display:flex;gap:6px}
+.ocr{margin-top:12px;animation:rise .5s var(--ease) both}
+.ocr.err{color:var(--dn);font-size:13px}
+.otxt{white-space:pre-wrap;word-break:break-word;background:var(--card2);padding:12px 14px;border-radius:12px;line-height:1.75}
+.g2{display:flex;gap:6px}
+.g2 .cc{display:inline-flex;align-items:center;gap:5px;font:inherit;background:var(--card2);color:var(--tx);padding:6px 11px;border-radius:10px;font-size:13px}
+.g2 .cc:hover{background:var(--br)}.g2 .cc svg{width:14px;height:14px}
 .code pre{margin:0;padding:14px;overflow:auto;max-height:420px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
   font-size:13px;line-height:1.65;color:#e6edf3;tab-size:2;white-space:pre;direction:ltr;text-align:left}
 .t a{color:var(--ac);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--ac) 40%,transparent)}
@@ -269,6 +279,7 @@ const ICONS = {
   open:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16v4zM13 7l4 4"/>',
   chk:'<path d="M5 12l5 5L20 7"/>',
+  scan:'<path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3M8 12h8"/>',
   inbox:'<path d="M3 13l3-8h12l3 8v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM3 13h5l1 3h6l1-3h5"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>'
@@ -373,6 +384,31 @@ function view(){
   let v=items.filter(i=>!k||(i.content||"").toLowerCase().includes(k)||(i.file_name||"").toLowerCase().includes(k));
   return v.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created_at)-new Date(a.created_at));
 }
+/* ---------- OCR (استخراج النص من الصورة) ---------- */
+const ocrRes={};
+function ocrPanel(id){
+  const r=ocrRes[id]; if(!r) return "";
+  if(r.loading) return `<div class="ocr"><div class="sk" style="height:64px"></div><div class="meta">جاري الاستخراج...</div></div>`;
+  if(r.error) return `<div class="ocr err">${esc(r.error)}</div>`;
+  if(!r.text.trim()) return `<div class="ocr err">ما لقيت نص بالصورة</div>`;
+  const btns=(l)=>`<button class="cc" data-oc="${id}">${ic("copy")}${l}</button><button class="cc" data-os="${id}">${ic("chk")}حفظ بالقسم</button>`;
+  return `<div class="ocr">`+(r.is_code
+    ?`<div class="code"><div class="ch"><span>${esc(r.language||"code")}</span><span class="g">${btns("نسخ الكود")}</span></div><pre>${esc(r.text)}</pre></div>`
+    :`<div class="otxt" dir="auto">${esc(r.text)}</div><div class="acts"><span class="g2">${btns("نسخ النص")}</span></div>`)+`</div>`;
+}
+async function runOcr(it){
+  ocrRes[it.id]={loading:true}; renderList(false);
+  const msg={busy:"الخدمة مشغولة، جرّب بعد دقيقة",no_key:"مفتاح Gemini غير مضبوط بالدالة",too_big:"الصورة أكبر من 8MB",image_not_found:"ما لقيت الصورة",not_image:"الملف مو صورة"};
+  try{
+    const res=await fetch(`${SUPABASE_URL}/functions/v1/ocr`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY},body:JSON.stringify({path:it.file_path})});
+    if(res.status===404) throw new Error("الدالة ocr غير منشورة بعد");
+    const j=await res.json().catch(()=>({}));
+    if(!res.ok||j.error) throw new Error(msg[j.error]||(j.error==="gemini"?"فشل Gemini (رمز "+j.status+")":"تعذر الاستخراج"));
+    ocrRes[it.id]={text:j.text||"",is_code:!!j.is_code,language:j.language||""};
+  }catch(e){ocrRes[it.id]={error:e.message||"تعذر الاستخراج"}}
+  renderList(false);
+}
+
 /* ---------- code detection ---------- */
 function looksLikeCode(t){
   const lines=t.split("\n").filter(l=>l.trim());
@@ -420,7 +456,7 @@ function renderList(all){
     return `<div class="${cls}" ${d} data-id="${it.id}">${head}
       ${im?`<img class="thumb" src="${u}" loading="lazy" data-lb="${it.id}" alt="">`:""}
       <div class="file">${im?"":badge(it.file_name)}<div style="min-width:0"><div class="fn" dir="auto">${esc(it.file_name)}</div><div class="meta">${sz(it.file_size)} · ${ago(it.created_at)}</div></div></div>
-      <div class="acts"><button class="btn sm p" data-a="dl" data-id="${it.id}">${ic("dl")}تنزيل</button><button class="btn sm" data-a="open" data-id="${it.id}">${ic("open")}فتح</button>${pin}${del}</div></div>`;
+      <div class="acts"><button class="btn sm p" data-a="dl" data-id="${it.id}">${ic("dl")}تنزيل</button><button class="btn sm" data-a="open" data-id="${it.id}">${ic("open")}فتح</button>${im?`<button class="btn sm" data-a="ocr" data-id="${it.id}">${ic("scan")}استخراج النص من الصورة</button>`:""}${pin}${del}</div>${im?ocrPanel(it.id):""}</div>`;
   }).join("");
   seen=new Set(v.map(i=>i.id)); updBulk();
 }
@@ -441,6 +477,13 @@ async function remove(ids){
   await sb.from("items").delete().in("id",ids); ids.forEach(i=>sel.delete(i)); loadItems();
 }
 $("list").onclick=async e=>{
+  const oc=e.target.closest("[data-oc]");
+  if(oc){const r=ocrRes[oc.dataset.oc];if(r?.text){await navigator.clipboard.writeText(r.text);toast("تم النسخ ✓")}return}
+  const os=e.target.closest("[data-os]");
+  if(os){const r=ocrRes[os.dataset.os];if(r?.text&&cur){
+    const c=r.is_code?"```"+(r.language||"")+"\n"+r.text+"\n```":r.text;
+    const {error}=await sb.from("items").insert({section_id:cur,kind:"text",content:c});
+    if(error)toast("تعذر الحفظ");else{toast("تم الحفظ بالقسم ✓");loadItems()}}return}
   const cc=e.target.closest("[data-cc]");
   if(cc){const [id,si]=cc.dataset.cc.split("|");const it=byId(id);if(it){await navigator.clipboard.writeText(segments(it.content)[+si].text);
     cc.classList.add("ok");cc.lastChild.textContent="تم النسخ ✓";setTimeout(()=>{cc.classList.remove("ok");cc.lastChild.textContent="نسخ الكود"},1500)}return}
@@ -451,6 +494,7 @@ $("list").onclick=async e=>{
   if(a==="copy"){await navigator.clipboard.writeText(it.content);toast("تم النسخ ✓")}
   if(a==="dl") download(it);
   if(a==="open") window.open(urlOf(it.file_path),"_blank");
+  if(a==="ocr") runOcr(it);
   if(a==="del") remove([it.id]);
   if(a==="pin"){const {error}=await sb.from("items").update({pinned:!it.pinned}).eq("id",it.id);if(error)toast("شغّل تحديث SQL للتثبيت");else loadItems()}
 };
