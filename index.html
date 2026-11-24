@@ -108,6 +108,16 @@ textarea{width:100%;border:0;background:none;outline:0;resize:none;font:inherit;
 .chk{box-shadow:0 2px 8px #0003}.body{padding-inline-start:0}
 .selmode .it .body,.it:hover .body{}
 .t{white-space:pre-wrap;word-break:break-word;line-height:1.75;padding-inline:36px 30px;min-height:24px}
+.code{margin:8px 0;border-radius:12px;overflow:hidden;background:#0d1117;border:1px solid #232a36;direction:ltr;text-align:left}
+.t+.code,.code+.t{margin-top:10px}
+.code .ch{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 6px 12px;background:#161b24;color:#8b95a7;font-size:12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.code .cc{display:inline-flex;align-items:center;gap:5px;font:inherit;font-family:"IBM Plex Sans Arabic",sans-serif;color:#c9d1d9;background:#ffffff14;padding:4px 10px;border-radius:8px;transition:background .2s,transform .2s var(--ease)}
+.code .cc:hover{background:#ffffff26}.code .cc:active{transform:scale(.94)}
+.code .cc.ok{background:#1f9d6340;color:#7ee2b0}
+.code .cc svg{width:13px;height:13px}
+.code pre{margin:0;padding:14px;overflow:auto;max-height:420px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  font-size:13px;line-height:1.65;color:#e6edf3;tab-size:2;white-space:pre;direction:ltr;text-align:left}
 .t a{color:var(--ac);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--ac) 40%,transparent)}
 .lk{display:flex;align-items:center;gap:10px;background:var(--card2);padding:9px 12px;border-radius:12px;margin-top:10px;text-decoration:none;color:var(--tx);transition:background .2s}
 .lk:hover{background:var(--acs)}
@@ -362,6 +372,28 @@ function view(){
   let v=items.filter(i=>!k||(i.content||"").toLowerCase().includes(k)||(i.file_name||"").toLowerCase().includes(k));
   return v.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created_at)-new Date(a.created_at));
 }
+/* ---------- code detection ---------- */
+function looksLikeCode(t){
+  const lines=t.split("\n").filter(l=>l.trim());
+  if(lines.length<2) return false;
+  const ar=(t.match(/[؀-ۿ]/g)||[]).length; if(ar/t.length>0.15) return false;
+  const sig=[/[{};]\s*$/,/=>|->|::|\|\||&&|===?|!==?/,/^\s*(function|const|let|var|import|export|return|class|def|from|public|private|if|for|while|elif|else|try|catch|#include|using|package|SELECT|INSERT|UPDATE|CREATE|npm|git|pip|cd)\b/i,/^\s*<\/?[a-z!][^>]*>/i,/^\s*\$ /,/^\s{2,}\S/,/\w+\(.*\)/,/^\s*(\/\/|#|\/\*|\*)/];
+  let hit=0; lines.forEach(l=>{if(sig.some(r=>r.test(l)))hit++});
+  return hit/lines.length>=0.5 && hit>=2;
+}
+function segments(c){
+  const out=[], re=/```([\w+#.-]*)[ \t]*\n?([\s\S]*?)```/g; let last=0,m;
+  while((m=re.exec(c))){
+    if(m.index>last) out.push({code:false,text:c.slice(last,m.index)});
+    out.push({code:true,lang:m[1],text:m[2].replace(/\n$/,"")}); last=re.lastIndex;
+  }
+  if(last<c.length){
+    const rest=c.slice(last);
+    if(!out.length && looksLikeCode(rest)) out.push({code:true,lang:"",text:rest.replace(/\s+$/,"")});
+    else out.push({code:false,text:rest});
+  }
+  return out;
+}
 function renderList(all){
   const v=view(); imgs=v.filter(i=>(i.file_type||"").startsWith("image/"));
   if(!v.length){$("list").innerHTML=`<div class="empty"><div class="em">${ic("inbox")}</div><div style="font-weight:600;color:var(--tx);margin-bottom:4px">${q?"ما لقينا شي":"القسم فارغ"}</div>${q?"جرّب كلمة ثانية":"الصق نص أو ارفع ملف للبداية"}</div>`;seen=new Set();updBulk();return}
@@ -373,9 +405,12 @@ function renderList(all){
     const pin=`<button class="btn sm" data-a="pin" data-id="${it.id}">${ic("pin")}${it.pinned?"إلغاء التثبيت":"تثبيت"}</button>`;
     const del=`<button class="btn sm danger" data-a="del" data-id="${it.id}">${ic("del")}حذف</button>`;
     if(it.kind==="text"){
-      const u=(it.content.match(/https?:\/\/[^\s]+/)||[])[0], h=u&&host(u);
-      const html=esc(it.content).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
-      return `<div class="${cls}" ${d} data-id="${it.id}">${head}<div class="t">${html}</div>
+      const segs=segments(it.content), plain=segs.filter(s=>!s.code).map(s=>s.text).join("\n");
+      const u=(plain.match(/https?:\/\/[^\s]+/)||[])[0], h=u&&host(u);
+      const html=segs.map((s,si)=>s.code
+        ?`<div class="code"><div class="ch"><span>${esc(s.lang||"code")}</span><button class="cc" data-cc="${it.id}|${si}">${ic("copy")}نسخ الكود</button></div><pre>${esc(s.text)}</pre></div>`
+        :(s.text.trim()?`<div class="t">${esc(s.text.trim()).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}</div>`:"")).join("");
+      return `<div class="${cls}" ${d} data-id="${it.id}">${head}${html}
         ${h?`<a class="lk" href="${esc(u)}" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=${h}&sz=64" alt="" onerror="this.style.display='none'"><span>${esc(h)}</span></a>`:""}
         <div class="meta">${ago(it.created_at)}</div>
         <div class="acts"><button class="btn sm" data-a="copy" data-id="${it.id}">${ic("copy")}نسخ</button>${pin}${del}</div></div>`;
@@ -405,6 +440,9 @@ async function remove(ids){
   await sb.from("items").delete().in("id",ids); ids.forEach(i=>sel.delete(i)); loadItems();
 }
 $("list").onclick=async e=>{
+  const cc=e.target.closest("[data-cc]");
+  if(cc){const [id,si]=cc.dataset.cc.split("|");const it=byId(id);if(it){await navigator.clipboard.writeText(segments(it.content)[+si].text);
+    cc.classList.add("ok");cc.lastChild.textContent="تم النسخ ✓";setTimeout(()=>{cc.classList.remove("ok");cc.lastChild.textContent="نسخ الكود"},1500)}return}
   const s=e.target.closest("[data-sel]"); if(s){toggleSel(s.dataset.sel);return}
   const l=e.target.closest("[data-lb]"); if(l){openLb(l.dataset.lb);return}
   const b=e.target.closest("[data-a]"); if(!b) return;
