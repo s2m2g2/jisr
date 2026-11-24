@@ -400,7 +400,7 @@ async function runOcr(it){
   ocrRes[it.id]={loading:true}; renderList(false);
   const msg={busy:"الخدمة مشغولة، جرّب بعد دقيقة",no_key:"مفتاح Gemini غير مضبوط بالدالة",too_big:"الصورة أكبر من 8MB",image_not_found:"ما لقيت الصورة",not_image:"الملف مو صورة"};
   try{
-    const res=await fetch(`${SUPABASE_URL}/functions/v1/ocr`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY},body:JSON.stringify({path:it.file_path})});
+    const res=await fetch(`${SUPABASE_URL}/functions/v1/quick-api`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY},body:JSON.stringify({path:it.file_path})});
     if(res.status===404) throw new Error("الدالة ocr غير منشورة بعد");
     const j=await res.json().catch(()=>({}));
     if(!res.ok||j.error) throw new Error(msg[j.error]||(j.error==="gemini"?"فشل Gemini (رمز "+j.status+")":"تعذر الاستخراج"));
